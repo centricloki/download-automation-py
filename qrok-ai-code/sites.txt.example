@@ -1,0 +1,10 @@
+# Example sites.txt file
+# One site key per line
+# Lines starting with # are comments and will be ignored
+
+# Run Delaware Business Licenses download
+delaware_business_licenses
+
+# Add more sites below as needed
+# another_site
+# yet_another_site

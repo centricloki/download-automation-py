@@ -1,0 +1,11 @@
+# Playwright Automation Framework - Dependencies
+# Install with: pip install -r requirements.txt
+
+# Core automation library
+playwright>=1.45.0
+
+# Async SMTP library for email notifications
+aiosmtplib>=1.1.0
+
+# Additional utilities (optional, for future enhancements)
+python-dotenv>=1.0.0
