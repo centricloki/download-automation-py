@@ -15,6 +15,7 @@ import asyncio
 import logging
 from pathlib import Path
 from playwright.async_api import async_playwright, TimeoutError as PlaywrightTimeoutError
+import config
 from utils import ensure_dir, retry_with_backoff
 from email_notifier import send_email_notification
 from change_detector import has_updates
@@ -33,15 +34,17 @@ async def download_site(self, site_key: str, config: dict, email_config: dict):
     logging.info(f"Starting {site_key}")
 
     # === NEW CHANGE DETECTION ===
-    if config.get("check_updates", True):
-        if not await has_updates(site_key, config):
-            logging.info(f"⏭️  Skipping {site_key} - No updates found.")
-            await send_email_notification(
-                subject=f"No Update - {site_key}",
-                body=f"No new data available for {site_key} at this time.",
-                config=email_config
-            )
-            return "SKIPPED"
+    if config.get("check_updates", False):
+        logging.info(f"🔍 Checking for updates on {site_key}...")
+        try:
+            updates_available = await has_updates(site_key, config)
+            if not updates_available:
+                msg = f"No updates found for {site_key}. Skipping download."
+                logging.info(f"⏭️ {msg}")
+                # Return a special string so main.py knows it was skipped
+                return f"SKIPPED: {msg}" 
+        except Exception as e:
+            logging.warning(f"Update check failed for {site_key}: {e}. Proceeding with download anyway.")
 
 class AsyncPlaywrightDownloader:
     """

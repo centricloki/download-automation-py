@@ -203,19 +203,23 @@ async def main():
     
     success_count = 0
     fail_count = 0
+    skipped_count = 0 
     
     for i, result in enumerate(results):
         site_key = list(selected_sites.keys())[i]
-        
+
         if isinstance(result, Exception):
             fail_count += 1
-            print(f"   ❌ {site_key}: {type(result).__name__}: {str(result)[:100]}")
+            print(f" ❌ {site_key}: {type(result).__name__}: {str(result)[:100]}")
+        elif isinstance(result, str) and result.startswith("SKIPPED:"):
+            skipped_count += 1
+            print(f" ⏭️ {site_key}: {result}")
         else:
             success_count += 1
-            print(f"   ✅ {site_key}: {result}")
+            print(f" ✅ {site_key}: {result}")
     
     print("=" * 60)
-    print(f"✅ Success: {success_count} | ❌ Failed: {fail_count}")
+    print(f"✅ Success: {success_count} | ⏭️ Skipped: {skipped_count} | ❌ Failed: {fail_count}")
     print("Check logs/downloader.log for detailed information.")
 
 
