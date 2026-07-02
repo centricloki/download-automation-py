@@ -21,6 +21,8 @@ SITES = {
         "download_dir": "downloads/delaware",
         "format": "XLSX",  # Excel format
         "fallback_format": "CSV for Excel",  # Fallback if XLSX unavailable
+        "check_updates": True,           # New flag
+        "metadata_file": "downloads/delaware/metadata.json"  # New
     },
     
     # Example: Add more sites here following the same pattern

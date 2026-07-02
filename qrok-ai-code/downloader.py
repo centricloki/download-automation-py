@@ -17,6 +17,7 @@ from pathlib import Path
 from playwright.async_api import async_playwright, TimeoutError as PlaywrightTimeoutError
 from utils import ensure_dir, retry_with_backoff
 from email_notifier import send_email_notification
+from change_detector import has_updates
 
 # Configure logging with both file and console output
 logging.basicConfig(
@@ -27,6 +28,20 @@ logging.basicConfig(
         logging.StreamHandler()
     ]
 )
+
+async def download_site(self, site_key: str, config: dict, email_config: dict):
+    logging.info(f"Starting {site_key}")
+
+    # === NEW CHANGE DETECTION ===
+    if config.get("check_updates", True):
+        if not await has_updates(site_key, config):
+            logging.info(f"⏭️  Skipping {site_key} - No updates found.")
+            await send_email_notification(
+                subject=f"No Update - {site_key}",
+                body=f"No new data available for {site_key} at this time.",
+                config=email_config
+            )
+            return "SKIPPED"
 
 class AsyncPlaywrightDownloader:
     """
@@ -143,7 +158,7 @@ class AsyncPlaywrightDownloader:
 
             # Step 5: Click Download button to start download
             logging.info("Initiating download...")
-            download_btn = page.get_by_role("button", name="Download")
+            download_btn = page.get_by_test_id("export-download-button")
             
             # Use async with to properly manage the download event listener
             # This prevents the "Future exception was never retrieved" asyncio error
